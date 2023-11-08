@@ -70,11 +70,14 @@ def get_total_sales():
     return total_sales
 
 # Streamlit UI
+
+
+# Streamlit UI
 st.title('Pharmacy Management System')
 
 # Login Section
 st.header('Login')
-user_name = st.text_input('name')
+user_name = st.text_input('User Name')
 user_password = st.text_input('Password', type='password')
 
 if st.button('Login'):
@@ -87,93 +90,114 @@ if st.button('Login'):
         st.error('Invalid credentials. Please try again.')
 
 # Logout Section
-if st.session_state.get('logged_in'):
+if st.session_state.logged_in:
     if st.button('Logout'):
         st.session_state.pop('logged_in')
         st.session_state.pop('user_id')
         st.success('You have been logged out.')
 
 # Add Company Section
-st.header('Add Company')
-company_name = st.text_input('Company Name')
-company_address = st.text_input('Company Address')
-company_phone = st.text_input('Company Phone')
+if st.session_state.logged_in:
+    st.header('Add Company')
+    company_name = st.text_input('Company Name')
+    company_address = st.text_input('Company Address')
+    company_phone = st.text_input('Company Phone')
 
-if st.button('Submit Company'):
-    add_company(company_name, company_address, company_phone)
-    st.success('Company added successfully!')
+    if st.button('Submit Company'):
+        add_company(company_name, company_address, company_phone)
+        st.success('Company added successfully!')
+else:
+    st.warning('You need to log in to access this feature.')
 
 # Add User Section
-st.header('Add User')
-user_name = st.text_input('User Name')
-user_email = st.text_input('User Email')
-user_role = st.selectbox('User Role', ['admin', 'staff'])
+if st.session_state.logged_in:
+    st.header('Add User')
+    user_name = st.text_input('User Name')
+    user_email = st.text_input('User Email')
+    user_role = st.selectbox('User Role', ['admin', 'staff'])
 
-if st.button('Submit User'):
-    add_user(user_name, user_email, user_role)
-    st.success('User added successfully!')
+    if st.button('Submit User'):
+        add_user(user_name, user_email, user_role)
+        st.success('User added successfully!')
+else:
+    st.warning('You need to log in to access this feature.')
 
 # Add Drug Section
-st.header('Add Drug')
-drug_name = st.text_input('Drug Name')
-drug_type = st.text_input('Type')
-drug_barcode = st.text_input('Barcode')
-drug_dose = st.text_input('Dose')
-drug_code = st.text_input('Code')
-drug_cost_price = st.number_input('Cost Price', value=0.0, step=0.01)
-drug_selling_price = st.number_input('Selling Price', value=0.0, step=0.01)
-drug_expiry = st.text_input('Expiry')
-drug_company_name = st.text_input('Drug Company Name')
-drug_production_date = st.date_input('Production Date')
-drug_expiration_date = st.date_input('Expiration Date')
-drug_place = st.text_input('Place')
-drug_quantity = st.number_input('Quantity', value=0)
+if st.session_state.logged_in:
+    st.header('Add Drug')
+    drug_name = st.text_input('Drug Name')
+    drug_type = st.text_input('Type')
+    drug_barcode = st.text_input('Barcode')
+    drug_dose = st.text_input('Dose')
+    drug_code = st.text_input('Code')
+    drug_cost_price = st.number_input('Cost Price', value=0.0, step=0.01)
+    drug_selling_price = st.number_input('Selling Price', value=0.0, step=0.01)
+    drug_expiry = st.text_input('Expiry')
+    drug_company_name = st.text_input('Drug Company Name')
+    drug_production_date = st.date_input('Production Date')
+    drug_expiration_date = st.date_input('Expiration Date')
+    drug_place = st.text_input('Place')
+    drug_quantity = st.number_input('Quantity', value=0)
 
-if st.button('Submit Drug'):
-    add_drug(drug_name, drug_type, drug_barcode, drug_dose, drug_code, drug_cost_price, drug_selling_price, drug_expiry, drug_company_name, drug_production_date, drug_expiration_date, drug_place, drug_quantity)
-    st.success('Drug added successfully!')
+    if st.button('Submit Drug'):
+        add_drug(drug_name, drug_type, drug_barcode, drug_dose, drug_code, drug_cost_price, drug_selling_price, drug_expiry, drug_company_name, drug_production_date, drug_expiration_date, drug_place, drug_quantity)
+        st.success('Drug added successfully!')
+else:
+    st.warning('You need to log in to access this feature.')
 
 # View Sales History Section
-st.header('View Sales History')
-barcode = st.text_input('Enter Barcode to View Sales History')
+if st.session_state.logged_in:
+    st.header('View Sales History')
+    barcode = st.text_input('Enter Barcode to View Sales History')
 
-if st.button('View Sales History'):
-    sales_history = view_sales_history(barcode)
-    if sales_history:
-        st.write('Sales History:')
-        st.write(sales_history)
-    else:
-        st.warning('No sales history found for the given barcode.')
+    if st.button('View Sales History'):
+        sales_history = view_sales_history(barcode)
+        if sales_history:
+            st.write('Sales History:')
+            st.write(sales_history)
+        else:
+            st.warning('No sales history found for the given barcode.')
+else:
+    st.warning('You need to log in to access this feature.')
 
 # View Drug and Company Info Section
-st.header('View Drug and Company Info')
-if st.button('View Info'):
-    info = get_drug_company_info()
-    if info:
-        st.write('Drug and Company Info:')
-        st.write(info)
-    else:
-        st.warning('No information found.')
+if st.session_state.logged_in:
+    st.header('View Drug and Company Info')
+    if st.button('View Info'):
+        info = get_drug_company_info()
+        if info:
+            st.write('Drug and Company Info:')
+            st.write(info)
+        else:
+            st.warning('No information found.')
+else:
+    st.warning('You need to log in to access this feature.')
 
 # View Expiring Drugs Section
-st.header('View Expiring Drugs')
-if st.button('View Expiring Drugs'):
-    expiring_drugs = get_expiring_drugs()
-    if expiring_drugs:
-        st.write('Expiring Drugs:')
-        st.write(expiring_drugs)
-    else:
-        st.warning('No expiring drugs found.')
+if st.session_state.logged_in:
+    st.header('View Expiring Drugs')
+    if st.button('View Expiring Drugs'):
+        expiring_drugs = get_expiring_drugs()
+        if expiring_drugs:
+            st.write('Expiring Drugs:')
+            st.write(expiring_drugs)
+        else:
+            st.warning('No expiring drugs found.')
+else:
+    st.warning('You need to log in to access this feature.')
 
 # View Total Sales Section
-st.header('View Total Sales')
-if st.button('View Total Sales'):
-    total_sales = get_total_sales()
-    if total_sales:
-        st.write('Total Sales:')
-        st.write(total_sales)
-    else:
-        st.warning('No sales found.')
+if st.session_state.logged_in:
+    st.header('View Total Sales')
+    if st.button('View Total Sales'):
+        total_sales = get_total_sales()
+        if total_sales:
+            st.write('Total Sales:')
+            st.write(total_sales)
+        else:
+            st.warning('No sales found.')
+else:
+    st.warning('You need to log in to access this feature.')
 
 # Close the connection
 cursor.close()
