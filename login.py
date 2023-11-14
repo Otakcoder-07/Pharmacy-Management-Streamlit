@@ -31,10 +31,15 @@ if st.button('Login'):
         st.success(f'Welcome, {user[1]}!')
         st.session_state.logged_in = True
         st.session_state.user_id = user[0]
-        #user_role=user[7]
+        user_role = user[7]
 
-        # Redirect to main app (main.py)
-        subprocess.run(["streamlit", "run", "project.py"])
+        # Redirect based on user role
+        if user_role == 'admin':
+            subprocess.run(["streamlit", "run", "project1.py"])
+        elif user_role == 'staff':
+            subprocess.run(["streamlit", "run", "project2.py"])
+        else:
+            st.error('Invalid role. Please contact the administrator.')
 
     else:
         st.error('Invalid credentials. Please try again.')

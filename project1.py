@@ -1,4 +1,3 @@
-# main.py
 import streamlit as st
 import mysql.connector
 import os
@@ -12,7 +11,7 @@ conn = mysql.connector.connect(
 )
 
 cursor = conn.cursor()
-user_role = os.getenv("USER_ROLE", "Staff")
+
 
 # Function to add a company
 def add_company(name, address, phone):
