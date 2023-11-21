@@ -7,7 +7,7 @@ conn = mysql.connector.connect(
     host='127.0.0.1',  
     user='root',  
     password='Shami@2003',  # Replace with your MySQL password
-    database='project_pharma'
+    database='pharmacy'
 )
 cursor = conn.cursor()
 
@@ -41,7 +41,7 @@ def get_expiring_drugs():
 def get_total_sales():
     cursor.execute('''
         SELECT name, SUM(quantity) 
-        FROM sales 
+        FROM history_sales 
         GROUP BY name
     ''')
     total_sales = cursor.fetchall()
@@ -49,6 +49,38 @@ def get_total_sales():
 
 
 st.title('Pharmacy Management System-Staff Page')
+
+def add_purchase(barcode, quantity):
+    cursor.execute('SELECT * FROM drugs WHERE barcode = %s', (barcode,))
+    drug = cursor.fetchone()
+
+    if drug:
+        if drug[12] >= quantity:  # Check if there is enough quantity in stock
+            amount = quantity * drug[6]  # Calculate the amount based on selling price
+            cursor.execute('INSERT INTO purchase (barcode, name, type, company_name, quantity, price, amount) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                           (drug[2], drug[0], drug[1], drug[8], quantity, drug[6], amount))
+            # Update quantity in the "drugs" table
+            cursor.execute('UPDATE drugs SET quantity = quantity - %s WHERE barcode = %s', (quantity, barcode))
+            # Update quantity in the "history_sales" table
+            cursor.execute('INSERT INTO history_sales (user_name, barcode, name, type, dose, quantity, price, amount, date, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, CURDATE(), CURTIME())',
+                           ('Staff', drug[2], drug[0], drug[1], drug[3], quantity, drug[6], amount))
+            conn.commit()
+            st.success('Purchase added successfully!')
+        else:
+            st.warning(f'Not enough stock available for {drug[0]}. Available quantity: {drug[12]}')
+    else:
+        st.warning(f'No drug found with barcode: {barcode}')
+
+
+
+st.title('Pharmacy Management System - Staff Page')
+st.header('Add Purchase')
+
+barcode_purchase = st.text_input('Enter Barcode for Purchase')
+quantity_purchase = st.number_input('Enter Quantity for Purchase', min_value=1, value=1)
+if st.button('Add Purchase'):
+    add_purchase(barcode_purchase, quantity_purchase)
+
 st.header('View Sales History')
 barcode = st.text_input('Enter Barcode to View Sales History')
 
@@ -86,6 +118,6 @@ if st.button('View Total Sales'):
     total_sales = get_total_sales()
     if total_sales:
         st.write('Total Sales:')
-        st.write(total_sales)
+        st.table(total_sales)
     else:
         st.warning('No sales found.')

@@ -7,49 +7,46 @@ conn = mysql.connector.connect(
     host='127.0.0.1',  
     user='root',  
     password='Shami@2003',  # Replace with your MySQL password
+    database='pharmacy'
+)
+
+conn2 = mysql.connector.connect(
+    host='127.0.0.1',  
+    user='root',  
+    password='Shami@2003',  # Replace with your MySQL password
     database='project_pharma'
 )
 
 cursor = conn.cursor()
-
+cursor2=conn2.cursor()
 
 # Function to add a company
 def add_company(name, address, phone):
-    if user_role == 'admin':
-        cursor.execute('INSERT INTO company (name, address, phone) VALUES (%s, %s, %s)', (name, address, phone))
-        conn.commit()
-        st.success('Company added successfully!')
-    else:
-        st.warning('Insufficient privileges to add a company.')
+    cursor.execute('INSERT INTO company (name, address, phone) VALUES (%s, %s, %s)', (name, address, phone))
+    conn.commit()
+    st.success('Company added successfully!')
 
 # Function to add a user
-def add_user(name, email, role):
-    if user_role == 'admin':
-        cursor.execute('INSERT INTO users (name, email, role) VALUES (%s, %s, %s)', (name, email, role))
-        conn.commit()
-        st.success('User added successfully!')
-    else:
-        st.warning('Insufficient privileges to add a user.')
+def add_user(name, role, user_id, date_of_birth, address, phone, salary, password):
+    cursor.execute('INSERT INTO users (name, role, id, dob, address, phone, salary, password) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
+                   (name, role, user_id, date_of_birth, address, phone, salary, password))
+    conn.commit()
+    st.success('User added successfully!')
+
 
 # Function to add a drug
 def add_drug(name, type, barcode, dose, code, cost_price, selling_price, expiry, company_name, production_date, expiration_date, place, quantity):
-    if user_role == 'admin':
+    try:
         cursor.execute('INSERT INTO drugs (name, type, barcode, dose, code, cost_price, selling_price, expiry, company_name, production_date, expiration_date, place, quantity) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (name, type, barcode, dose, code, cost_price, selling_price, expiry, company_name, production_date, expiration_date, place, quantity))
         conn.commit()
-        st.success('Drug added successfully!')
-    else:
-        st.warning('Insufficient privileges to add a drug.')
-
-# Rest of the code remains the same...
-
-# You can now continue with the remaining sections of your code.
-# Remember to include role-based access checks for other functions as needed.
+        st.write("Added drug successfully")
+    except mysql.connector.Error as err:
+        if err.errno == 1644:
+            st.error('Expiration date must be greater than production date')
+        else:
+            st.error(f"Error: {err}")
 
 
-# Function to add a drug
-def add_drug(name, type, barcode, dose, code, cost_price, selling_price, expiry, company_name, production_date, expiration_date, place, quantity):
-    cursor.execute('INSERT INTO drugs (name, type, barcode, dose, code, cost_price, selling_price, expiry, company_name, production_date, expiration_date, place, quantity) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (name, type, barcode, dose, code, cost_price, selling_price, expiry, company_name, production_date, expiration_date, place, quantity))
-    conn.commit()
 
 # Function to retrieve sales history for a given barcode
 def view_sales_history(barcode):
@@ -81,7 +78,7 @@ def get_expiring_drugs():
 def get_total_sales():
     cursor.execute('''
         SELECT name, SUM(quantity) 
-        FROM sales 
+        FROM history_sales 
         GROUP BY name
     ''')
     total_sales = cursor.fetchall()
@@ -106,12 +103,18 @@ if st.button('Submit Company'):
 
 # Add User Section
 st.header('Add User')
-user_name = st.text_input('Give User Name')
-user_email = st.text_input('User Email')
+
+user_name = st.text_input('User Name')
 user_role = st.selectbox('User Role', ['admin', 'staff'])
+user_id = st.text_input('User ID')
+date_of_birth = st.date_input('Date of Birth')
+address = st.text_input('Address')
+phone = st.text_input('Phone')
+salary = st.number_input('Salary')
+password = st.text_input('Password', type='password')
 
 if st.button('Submit User'):
-    add_user(user_name, user_email, user_role)
+    add_user(user_name, user_role,user_id,date_of_birth,address,phone,salary,password)
     st.success('User added successfully!')
 
 # Add Drug Section
@@ -132,12 +135,32 @@ drug_quantity = st.number_input('Quantity', value=0)
 
 if st.button('Submit Drug'):
     add_drug(drug_name, drug_type, drug_barcode, drug_dose, drug_code, drug_cost_price, drug_selling_price, drug_expiry, drug_company_name, drug_production_date, drug_expiration_date, drug_place, drug_quantity)
-    st.success('Drug added successfully!')
+
+def remove_user(user_id):
+    cursor.execute('DELETE FROM users WHERE id = %s', (user_id,))
+    conn.commit()
+st.header('Remove User')
+user_id_to_remove = st.text_input('Enter User ID to Remove')
+if st.button('Remove User'):
+    remove_user(user_id_to_remove)
+    st.success(f'User with ID {user_id_to_remove} removed successfully!')
+
+
+
+def remove_drug(barcode):
+    cursor.execute('DELETE FROM drugs WHERE barcode = %s', (barcode,))
+    conn.commit()
+# Remove Drug Section
+st.header('Remove Drug')
+barcode_to_remove = st.text_input('Enter Barcode to Remove Drug')
+if st.button('Remove Drug'):
+    remove_drug(barcode_to_remove)
+    st.success(f'Drug with Barcode {barcode_to_remove} removed successfully!')
+
 
 # View Sales History Section
 st.header('View Sales History')
 barcode = st.text_input('Enter Barcode to View Sales History')
-
 if st.button('View Sales History'):
     sales_history = view_sales_history(barcode)
     if sales_history:
@@ -172,6 +195,14 @@ if st.button('View Total Sales'):
     total_sales = get_total_sales()
     if total_sales:
         st.write('Total Sales:')
-        st.write(total_sales)
+        st.dataframe(total_sales)
     else:
         st.warning('No sales found.')
+
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+[33mcommit 567e8eb9d596e60f2918c154c49da5e01d60c0bb[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Shamith <chandrashamith@gmail.com>
+Date:   Tue Nov 14 15:06:49 2023 +0530
+
+    Added priveleges required
+
+[33mcommit 5b5e83e92901828b35bb88f85eca0fcec268014e[m
+Author: Shamith <chandrashamith@gmail.com>
+Date:   Tue Nov 14 14:57:55 2023 +0530
+
+    Only adding priveleges part left
+
+[33mcommit 46e93be8e0ea8681d7d82f61cbf86166f715b4ba[m
+Author: Shamith <chandrashamith@gmail.com>
+Date:   Wed Nov 8 16:49:07 2023 +0530
+
+    login implemented
+
+[33mcommit 67050a43208dbb6cc8007acc89f64fc9b191ae84[m
+Author: Shamith <chandrashamith@gmail.com>
+Date:   Wed Nov 8 09:03:20 2023 +0530
+
+    We still have to implement login properly
+
+[33mcommit b5d1d95300fb8879bd4bc1f2afd37d98b763caf0[m
+Author: Shamith <chandrashamith@gmail.com>
+Date:   Fri Nov 3 17:10:27 2023 +0530
+
+    Built a basic model
