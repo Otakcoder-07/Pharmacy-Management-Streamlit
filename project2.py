@@ -6,8 +6,13 @@ import os
 conn = mysql.connector.connect(
     host='127.0.0.1',  
     user='root',  
+<<<<<<< HEAD
     password='Shami@2003',  # Replace with your MySQL password
     database='pharmacy'
+=======
+    password='',  # Replace with your MySQL password
+    database='project_pharma'
+>>>>>>> 4be661a085116fb43d83d9d919f441ab04d02273
 )
 cursor = conn.cursor()
 

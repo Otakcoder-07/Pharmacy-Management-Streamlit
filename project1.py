@@ -10,15 +10,9 @@ conn = mysql.connector.connect(
     database='pharmacy'
 )
 
-conn2 = mysql.connector.connect(
-    host='127.0.0.1',  
-    user='root',  
-    password='Shami@2003',  # Replace with your MySQL password
-    database='project_pharma'
-)
+
 
 cursor = conn.cursor()
-cursor2=conn2.cursor()
 
 # Function to add a company
 def add_company(name, address, phone):
