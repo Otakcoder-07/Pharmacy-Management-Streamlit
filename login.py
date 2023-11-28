@@ -7,7 +7,7 @@ import subprocess
 conn = mysql.connector.connect(
     host='127.0.0.1',  
     user='root',  
-    password='',  # Replace with your MySQL password
+    password='Shami@2003',  # Replace with your MySQL password
     database='pharmacy'
 )
 cursor = conn.cursor()

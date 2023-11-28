@@ -39,6 +39,7 @@ def add_drug(name, type, barcode, dose, code, cost_price, selling_price, expiry,
             st.error('Expiration date must be greater than production date')
         else:
             st.error(f"Error: {err}")
+   
 
 
 
